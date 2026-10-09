@@ -7,7 +7,15 @@
     <artifactId>jthreadgo</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>JthreadGo</name>
-    <description>A small Java API and startup JVMTI agent for asynchronous platform-thread abort requests.</description>
+    <description>Experimental Java 25 library for Thread.stop()-style asynchronous platform-thread stopping using JNI and a native JVMTI startup agent.</description>
+    <url>https://github.com/M-PRANAY/JthreadGo</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/M-PRANAY/JthreadGo.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/M-PRANAY/JthreadGo.git</developerConnection>
+        <url>https://github.com/M-PRANAY/JthreadGo</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <licenses>
         <license>

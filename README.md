@@ -1,6 +1,8 @@
-# JthreadGo
+# JthreadGo: Java thread stopping with JVMTI
 
-An experimental asynchronous stop API for Java 25 platform threads, backed by a small JVMTI startup agent.
+JthreadGo is an experimental Java 25 library for `Thread.stop()`-style asynchronous stopping of platform threads, using JNI and a small native JVMTI startup agent. It provides a way to study stopping running Java code that ignores `Thread.interrupt()`.
+
+[Quick start](#build-and-run-the-example) | [Maven integration](#use-in-an-application) | [API reference](docs/API.md) | [Examples](examples/) | [Test coverage](docs/TESTING.md)
 
 ```java
 import org.jthreadgo.JthreadGo;
@@ -11,6 +13,18 @@ JthreadGo.stop(workerThread);
 The JVM injects `JthreadGo.StopRequested`, an `Error`, into the target thread. This can stop Java code that ignores interruption, including a running CPU loop. It also inherits the hazards of the historical `Thread.stop()` mechanism: application state can be left inconsistent, and code can catch the signal and continue.
 
 **A successful stop request does not guarantee termination.** Use process isolation when uncooperative work must be terminated while preserving the parent application's health.
+
+## How this relates to Thread.stop()
+
+On Java 25, [`Thread.stop()` throws `UnsupportedOperationException`](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/lang/Thread.html#stop()). JthreadGo calls the separate [JVMTI `StopThread` function](https://docs.oracle.com/en/java/javase/25/docs/specs/jvmti.html#StopThread) to request asynchronous exception delivery. The historical risks of inconsistent application state and interrupted cleanup still apply.
+
+| API | Purpose |
+| --- | --- |
+| `JthreadGo.isAvailable()` | Check whether the native startup agent is available. |
+| `JthreadGo.stop(Thread)` | Request an asynchronous stop of a platform thread in this JVM. |
+| `JthreadGo.stopAndWait(Thread, Duration)` | Request a stop, then wait for thread exit with a bounded join. |
+
+The Java library has no runtime Java dependencies. Building and using it requires the native agent described below. This project is intended for controlled experiments with Java thread termination and executor behavior.
 
 ## Requirements
 
@@ -138,6 +152,10 @@ The JVM handles exception delivery and thread exit. This mechanism uses JVMTI ra
 - [Artifacts and sharing](docs/DISTRIBUTION.md)
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
+
+## Related work
+
+[JThreadMagic](https://github.com/memcorrupt/JThreadMagic) is another project exposing JVMTI thread stopping. Both projects use the JVM's existing `StopThread` capability. JthreadGo's implementation uses an explicit startup agent, a custom `StopRequested` error, and disposable JVM tests for the behavior documented here.
 
 ## License
 
