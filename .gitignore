@@ -1,0 +1,37 @@
+# Build outputs and native compiler intermediates
+/target/
+/build/
+/dist/
+*.class
+*.dll
+*.so
+*.dylib
+*.obj
+*.o
+*.lib
+*.exp
+*.pdb
+*.jar
+
+# Local experiments, archived project-specific work, and machine settings
+/.local/
+/.idea/
+/.vscode/
+*.iml
+.env
+.env.*
+!.env.example
+
+# JVM diagnostics and logs can contain application data
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
+*.jfr
+*.dmp
+*.pid
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

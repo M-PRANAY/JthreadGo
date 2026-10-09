@@ -1,0 +1,50 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: JDK 25 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Build Java API, native agent, and isolated tests
+        run: mvn --batch-mode --no-transfer-progress clean verify
+      - name: Upload libraries
+        uses: actions/upload-artifact@v7
+        with:
+          name: jthreadgo-${{ runner.os }}-${{ runner.arch }}
+          if-no-files-found: error
+          path: |
+            LICENSE
+            README.md
+            docs/
+            target/*.jar
+            target/native/*.dll
+            target/native/*.so
+            target/native/*.dylib
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-${{ runner.os }}-${{ runner.arch }}
+          if-no-files-found: ignore
+          path: |
+            target/surefire-reports/
+            target/probe-reports/
